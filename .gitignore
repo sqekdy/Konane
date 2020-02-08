@@ -1,0 +1,11 @@
+## Ignore the pycharm temprorary files, build results and others
+
+#Build files
+
+__pycache__/
+.idea/
+
+
+#Virtual environment files
+
+venv/
