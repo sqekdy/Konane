@@ -22,6 +22,7 @@ def draw_board(the_board):
     # Create the surface of (width, height), and its window.
     surface = pygame.display.set_mode((surface_sz, surface_sz))
 
+    all_players=[]
 
     black_player = pygame.image.load("black.png")
     white_player = pygame.image.load("white.png")
