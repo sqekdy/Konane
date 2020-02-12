@@ -1,12 +1,6 @@
 import pygame
 import math
 
-def place_palyers(the_board, square_size):
-    pass
-
-
-
-
 
 def draw_board(the_board):
     """ Draw a konane board with black and white players, from the_board. """
@@ -52,7 +46,7 @@ def draw_board(the_board):
         # draw the players, white players occupy even space, and black players occupy odd space
         for (col, row) in the_board:
 
-            if (row+col)%2==1:
+            if (row+col)%2==0:
                 surface.blit(black_player,
                              (col * sq_sz + black_player_offset, row * sq_sz + black_player_offset))
 

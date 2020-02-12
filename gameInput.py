@@ -37,7 +37,7 @@ def message_printer(screen):
     screen.fill((0, 0, 0))
     textbox.center = screen.get_rect().center
     screen.blit(text, textbox)
-    pygame.display.flip()
+    pygame.display.update()
 
 
 
@@ -49,15 +49,9 @@ def name():
     font = pygame.font.Font(None, 27)
     text=font.render('Welcome to Konane!  Please choose a color (B or W)',True, display_color_maroon,display_color_yellow)
     textbox=text.get_rect()
-
-
-
     block = font.render("Your choice is :{}".format(name), True, (255, 255, 255))
     screen.blit(block, (150,350))
-    pygame.display.update()
-
-
-
+    pygame.display.flit()
 
 
 name()
