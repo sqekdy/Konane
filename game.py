@@ -8,7 +8,10 @@ def draw_board(the_board):
     pygame.init()
     colors = [(245,222,179), (205,133,63)]    # Set up colors [wheat, peru]
 
-    n = int(math.sqrt(len(the_board)+2))     # This is an NxN chess board, +2 because initially 2 players are removed
+    #TODO This gives error at later stage, as size of board shrinks and board size is pruned
+    # Use static value as of now, and figure out to dynamically create the board.
+   # n = int(math.sqrt(len(the_board)+2))     # This is an NxN chess board, +2 because initially 2 players are removed
+    n = 8
     surface_sz = 480           # Proposed physical surface size.
     sq_sz = surface_sz // n    # sq_sz is length of a square.
     surface_sz = n * sq_sz     # Adjust to exactly fit n squares.

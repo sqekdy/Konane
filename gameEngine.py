@@ -55,21 +55,7 @@ class gameEngine():
 
         pass
 
-    def fetch_player(self,r_p, c_p):
-        """
-        :param r_p:  Row position of the player to be returned
-        :param c_p: Column position of player to be returned
-        :return: Player object, that matches the r_p and c_p values, present in the game_players list object
-        """
-        #TODO Catch stop iteration and print that not a valid game player information
 
-        # The player object is determined by fetching the first item of generator object.
-        # Care must be taken, not to have identical objects with same row pos and same col pos in the board.
-
-        returned_player = (_ for _ in self.game_players
-                           if _.return_player(r_p, c_p) is not None)
-
-        return next(returned_player)
 
     def is_game_over(self):
         """ This function checks whether a game is over or not, based on the values computed by sef.
@@ -120,19 +106,28 @@ class gameEngine():
                 # TODO   Make event handler for UI, to register and capture move
                 #       For time being, input prompt works just fine, Implement UI if time permits
 
-                player_row, player_col = map(int,tuple(input(
-                    "Please enter row, column of player to move for eg, 25, where 2 is row, and 5 is column: ")))
+                while True:
+
+                    try:
+                        player_row, player_col = map(int,tuple(input(
+                            "Please enter row, column of player to move for eg, 25, where 2 is row, and 5 is column: ")))
 
 
-                player_transfer_row, player_transfer_column = map(int,tuple(input(
-                    "Please enter a valid move, for eg., 23, where 2 is row and 3 is column: ")))
+                        player_transfer_row, player_transfer_column = map(int,tuple(input(
+                        "Please enter a valid move, for eg., 23, where 2 is row and 3 is column: ")))
+
+                    except Exception:
+                        print("Invalid input. Please try again")
+                        continue
+
+                    break
 
 
                 current_board.update_board(player_transfer_row, player_transfer_column,
-                                           self.fetch_player(player_row, player_col), self.game_players)
+                                           player_row, player_col)
 
                 UI.draw_board(
-                    [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in self.game_players])
+                    [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in current_board.player_list])
 
 
                 #game_turn = 0  # Next move is AI move

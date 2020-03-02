@@ -74,6 +74,22 @@ class Board:
 
         return ai_score + human_score
 
+    def fetch_player(self, r_p, c_p):
+        """
+        :param r_p:  Row position of the player to be returned
+        :param c_p: Column position of player to be returned
+        :return: Player object, that matches the r_p and c_p values, present in the game_players list object
+        """
+        # TODO Catch stop iteration and print that not a valid game player information
+
+        # The player object is determined by fetching the first item of generator object.
+        # Care must be taken, not to have identical objects with same row pos and same col pos in the board.
+
+        returned_player = (_ for _ in self.player_list
+                           if _.return_player(r_p, c_p) is not None)
+
+        return next(returned_player) if not None else None
+
     def total_available_moves_for_players(self):
         """This function computes necessary data for the Static Evaluation Function which determines the game strategy
            We captures the available moves for black and white players, and draw a tree based on these values of SEF
@@ -167,15 +183,15 @@ class Board:
 
         return can_hop
 
-    def update_board(self, nrow, ncol, to_be_updated_player, cur_set_of_players):
+    def update_board(self, nrow, ncol, recent_pos_row, recent_pos_col):
         """Updates the board into another state
         Input: new_row, new_column for a player to move
                 Player object (i.e., a player) to be updated . Note, only 1 update at a time
                 Player list --> A list of players currently in the game
         Returns: A list of captured players to remove from the board"""
 
-        recent_pos_row = to_be_updated_player.cur_row_pos
-        recent_pos_col = to_be_updated_player.cur_col_pos
+        to_be_updated_player=self.fetch_player(recent_pos_row,recent_pos_col)
+
         # player_id = to_be_updated_player.player_id TODO Redundant player information, not needed here, remove later
 
         # Check whether player can move and the cell where it is moving is empty or not
@@ -204,48 +220,40 @@ class Board:
 
             if direction_to_remove_opponent == "vertical":
                 if not is_reverse:
-                    for captured_player_row in range(recent_pos_row + 1, nrow - 1):
+                    for captured_player_row in range(recent_pos_row + 1, nrow,2 ):
                         # Clearing space in board
                         self.board_layout[(captured_player_row, ncol)] = None
 
                         # remove players
-                        pl = next(_ for _ in cur_set_of_players
-                                  if _.return_player(captured_player_row, ncol) is not None)
 
+                        pl = self.fetch_player(captured_player_row, ncol)
                         pl.cur_row_pos = pl.cur_col_pos = None
-                        cur_set_of_players.remove(pl)
+                        self.player_list.remove(pl)
 
                 else:
-                    for captured_player_row in range(recent_pos_row - 1, nrow + 1, -1):
+                    for captured_player_row in range(recent_pos_row - 1, nrow , -2):
                         self.board_layout[(captured_player_row, ncol)] = None
 
-                        pl = next(_ for _ in cur_set_of_players
-                                  if _.return_player(captured_player_row, ncol) is not None)
-                        pl.cur_row_pos = pl.cur_col_pos = None
-                        cur_set_of_players.remove(pl)
+                        pl = self.fetch_player(captured_player_row, ncol)
+                        self.player_list.remove(pl)
 
             elif direction_to_remove_opponent == "horizontal":
 
                 if not is_reverse:
-                    for captured_player_col in range(recent_pos_col + 1, ncol - 1):
+                    for captured_player_col in range(recent_pos_col + 1, ncol,2 ):
                         self.board_layout[(nrow, captured_player_col)] = None
 
-                        pl = next(_ for _ in cur_set_of_players
-                                  if _.return_player(nrow, captured_player_col) is not None)
-
-                        pl.cur_row_pos = pl.cur_col_pos = None
-                        cur_set_of_players.remove(pl)
+                        pl = self.fetch_player(nrow, captured_player_col)
+                        self.player_list.remove(pl)
                         print("Player removed"+ str(pl.cur_row_pos) + str(pl.cur_col_pos))
 
                 else:
-                    for captured_player_col in range(recent_pos_col - 1, ncol + 1, -1):
+                    for captured_player_col in range(recent_pos_col - 1, ncol, -2):
                         self.board_layout[(nrow, captured_player_col)] = None
 
-                        pl = next(_ for _ in cur_set_of_players
-                                  if _.return_player(nrow, captured_player_col) is not None)
+                        pl = self.fetch_player(nrow, captured_player_col)
 
-                        pl.cur_row_pos = pl.cur_col_pos = None
-                        cur_set_of_players.remove(pl)
+                        self.player_list.remove(pl)
 
             else:
 
