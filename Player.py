@@ -1,15 +1,13 @@
-
 class Player:
 
     def __init__(self, row_pos, col_pos, pid, color):
         """This method initializes the player object
         Each player has a state of its own which includes the row position, the column position, a unique pid and a color
         Returns: A player object that is instantiated by the caller"""
-        self.cur_row_pos=row_pos
-        self.cur_col_pos=col_pos
-        self.player_id=pid
-        self.player_type=color
-
+        self.cur_row_pos = row_pos
+        self.cur_col_pos = col_pos
+        self.player_id = pid
+        self.player_type = color
 
     def can_move(self, new_pos):
         """ Input: new position of the player
@@ -19,20 +17,20 @@ class Player:
         we can finally conclude, whether player is movable and we can update the gameplay.
         Returns: Boolean value, True or False"""
 
-        new_row_pos, new_col_pos=new_pos # new_pos is a tuple that is passed into this method
+        new_row_pos, new_col_pos = new_pos  # new_pos is a tuple that is passed into this method
 
-
-        if (new_row_pos in range (0,7) and new_col_pos in range (0,7)): #Check the bound, the new row and column should not cross the board
+        if (new_row_pos in range(0, 8) and new_col_pos in range(0,
+                                                                8)):  # Check the bound, the new row and column should not cross the board
 
             # |new position -old position|%2==0 determines correct move in both horizontal and vertical direction
 
-            row_jump_distance=abs(new_row_pos-self.cur_row_pos)
-            col_jump_distance=abs(new_col_pos-self.cur_col_pos)
+            row_jump_distance = abs(new_row_pos - self.cur_row_pos)
+            col_jump_distance = abs(new_col_pos - self.cur_col_pos)
 
             # row_jump_distance or column_jump_distance !=0 verifies that the move is not in the same place as current
 
-            if ( row_jump_distance !=0 and  row_jump_distance % 2 == 0 and self.cur_col_pos == new_col_pos) or \
-                        (self.cur_row_pos == new_row_pos and col_jump_distance!=0 and col_jump_distance % 2 == 0):
+            if (row_jump_distance != 0 and row_jump_distance % 2 == 0 and self.cur_col_pos == new_col_pos) or \
+                    (self.cur_row_pos == new_row_pos and col_jump_distance != 0 and col_jump_distance % 2 == 0):
 
                 return True
 
@@ -43,13 +41,17 @@ class Player:
 
             return False
 
+    def return_player(self, pr, pc):
+        """ The main gameEngine would need a player object, to be passed to the board instance to make a valid move.
 
+        Input: row number and column number
+        :return: current player object
+        """
 
+        if (pr== self.cur_row_pos and pc== self.cur_col_pos):
 
+            return self
 
+        else:
 
-
-
-
-
-
+            return None
