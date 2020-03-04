@@ -95,7 +95,9 @@ class gameEngine():
 
             if (game_turn == 0):
 
-                # TODO Make a move here. AI plays here. Call minimax function from aiEngine
+                #TODO iterate through players and fetch the players in possible moves in board, and distinguish
+                # between black and white possible moves
+
                 # We do not want to change the state of the main game board, while minimax performs forward searching.
                 # A good approach would be to create a duplicate board object of current board and pass that to the function.
                 # This way we can maintain main game board, and experimental search board for the AI.
@@ -105,30 +107,25 @@ class gameEngine():
                 ai_move_p_row = ai_move_p_col = ai_move_d_row = ai_move_d_col = None
                 search_board = copy.deepcopy(self.current_board)
 
-                best_move_sef = aiEngine.minimax(search_board, 3, float("-inf"), float("inf"), True)
+                best_move_sef, play = aiEngine.minimax(search_board, 3, float("-inf"), float("inf"), True)
 
-                for poss_play in self.current_board.possible_play:
-                    search_board = copy.deepcopy(self.current_board)
-                    for move_from, move_to in poss_play.items():
-                        pr, pc = move_from
-                        dr, dc = move_to
-                        search_board.update_board(dr,dc, pr, pc)
-                        if search_board.sef_value == best_move_sef:
+                for k,v in play.items():
 
-                            is_updated = self.current_board.update_board(dr, dc, pr, pc)
-                            ai_move_p_row = pr
-                            ai_move_p_col = pc
-                            ai_move_d_row = dr
-                            ai_move_d_col = dc
+                        ai_move_p_row, ai_move_p_col, ai_move_d_row, ai_move_d_col = v
+                        is_updated = self.current_board.update_board(ai_move_d_row,
+                                                                     ai_move_d_col,
+                                                                     ai_move_p_row,
+                                                                     ai_move_p_col)
+
                         break
 
-                    if is_updated:
-                        print ("AI move is: ", ai_move_p_row,ai_move_p_col, " to ", ai_move_d_row, ai_move_d_col)
+                if is_updated:
+                    print ("AI move is: ", ai_move_p_row,ai_move_p_col, " to ", ai_move_d_row, ai_move_d_col)
 
-                        UI.draw_board(
-                            [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in
-                             self.current_board.player_list])
-                        break
+                    UI.draw_board(
+                        [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in
+                         self.current_board.player_list])
+
 
                 game_turn = 1  # Opponent move here
 
@@ -164,7 +161,7 @@ class gameEngine():
                     [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in self.current_board.player_list])
 
 
-                #game_turn = 0  # Next move is AI move
+                game_turn = 0  # Next move is AI move
 
 
 if __name__ == "__main__":
