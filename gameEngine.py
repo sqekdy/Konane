@@ -1,7 +1,8 @@
 from Player import Player
 from Board import Board
 import game as UI
-# import aiEngine
+import aiEngine
+import copy
 import math
 
 
@@ -22,6 +23,8 @@ class gameEngine():
         to_remove_s_row, to_remove_s_col = input("Please enter the row,column of 2nd player to remove, eg., 57: \n ")
 
         self.game_players = []
+
+        self.current_board=None
 
         opponent_type = input("Please choose your player type eg. black / white: ")
         self.ai_type = "black" if (opponent_type == "white") else "white"
@@ -57,13 +60,7 @@ class gameEngine():
 
 
 
-    def is_game_over(self):
-        """ This function checks whether a game is over or not, based on the values computed by sef.
-            i.e., if either player has 0 moves for (1 or 2 or 3 possible hops), then game is over, and
-            other player wins the game
 
-        :return: boolean value that indicates whether game is over or not, True-> game over ; False-> not over
-        """
 
     def start_game(self):
         """ This method is where the game starts, initial state of the board is drawn, and two pieces of players are
@@ -78,26 +75,60 @@ class gameEngine():
         game_turn = 0 if self.ai_type == "black" else 1
 
         # creates an initial board with 62 players in it.
-        current_board = Board("board" + str(board_index), self.game_players, self.ai_type, initial_depth, [])
+        self.current_board = Board("board" + str(board_index), self.game_players, self.ai_type, initial_depth, [])
 
         print("_____________")
-        print(current_board.sef_value)
+        print(self.current_board.sef_value)
 
         while can_game_continue:  # Keeps the game going , until loss or draw on either sides
 
-            gameEngine.available_moves = current_board.possible_play
+            gameEngine.available_moves = self.current_board.possible_play
 
             # After each move, check for a draw
+            # TODO Update game cannot draw in konane ...hehehe
 
-            if len(gameEngine.available_moves) == 0:  # If no available move for current board, game is draw
-
-                print("Game over. Result is draw.")
-
-                break
+            # if len(gameEngine.available_moves) == 0:  # If no available move for current board, game is draw
+            #
+            #     print("Game over. Result is draw.")
+            #
+            #     break
 
             if (game_turn == 0):
 
                 # TODO Make a move here. AI plays here. Call minimax function from aiEngine
+                # We do not want to change the state of the main game board, while minimax performs forward searching.
+                # A good approach would be to create a duplicate board object of current board and pass that to the function.
+                # This way we can maintain main game board, and experimental search board for the AI.
+                #AI is maximizing player
+
+                is_updated = False
+                ai_move_p_row = ai_move_p_col = ai_move_d_row = ai_move_d_col = None
+                search_board = copy.deepcopy(self.current_board)
+
+                best_move_sef = aiEngine.minimax(search_board, 3, float("-inf"), float("inf"), True)
+
+                for poss_play in self.current_board.possible_play:
+                    search_board = copy.deepcopy(self.current_board)
+                    for move_from, move_to in poss_play.items():
+                        pr, pc = move_from
+                        dr, dc = move_to
+                        search_board.update_board(dr,dc, pr, pc)
+                        if search_board.sef_value == best_move_sef:
+
+                            is_updated = self.current_board.update_board(dr, dc, pr, pc)
+                            ai_move_p_row = pr
+                            ai_move_p_col = pc
+                            ai_move_d_row = dr
+                            ai_move_d_col = dc
+                        break
+
+                    if is_updated:
+                        print ("AI move is: ", ai_move_p_row,ai_move_p_col, " to ", ai_move_d_row, ai_move_d_col)
+
+                        UI.draw_board(
+                            [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in
+                             self.current_board.player_list])
+                        break
 
                 game_turn = 1  # Opponent move here
 
@@ -105,6 +136,9 @@ class gameEngine():
 
                 # TODO   Make event handler for UI, to register and capture move
                 #       For time being, input prompt works just fine, Implement UI if time permits
+                #       Note that to give the next input, one need to close the pygame window, so that console frees up
+                #       A good implementation might be to power up the board in separate thread so that we have control
+                #       over the console window and the pygame window at the same time.
 
                 while True:
 
@@ -123,11 +157,11 @@ class gameEngine():
                     break
 
 
-                current_board.update_board(player_transfer_row, player_transfer_column,
+                self.current_board.update_board(player_transfer_row, player_transfer_column,
                                            player_row, player_col)
 
                 UI.draw_board(
-                    [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in current_board.player_list])
+                    [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in self.current_board.player_list])
 
 
                 #game_turn = 0  # Next move is AI move

@@ -87,8 +87,12 @@ class Board:
 
         returned_player = (_ for _ in self.player_list
                            if _.return_player(r_p, c_p) is not None)
+        try:
+            return next(returned_player) if not None else None
 
-        return next(returned_player) if not None else None
+        except Exception as StopIteration:
+            pass
+
 
     def total_available_moves_for_players(self):
         """This function computes necessary data for the Static Evaluation Function which determines the game strategy
@@ -98,6 +102,8 @@ class Board:
                  moves for black and white, according to the hop length """
 
         # data structure to store hop length -> {color:[{hop_length:count}], color2:[{hop_length:count}] }
+
+        self.possible_play = []
 
         data_for_sef = {"black": [{b: 0 for b in range(1, 4)}], "white": [{w: 0 for w in range(1, 4)}]}
 
@@ -192,10 +198,15 @@ class Board:
 
         to_be_updated_player=self.fetch_player(recent_pos_row,recent_pos_col)
 
+        if to_be_updated_player == None:
+            return False
+
         # player_id = to_be_updated_player.player_id TODO Redundant player information, not needed here, remove later
 
         # Check whether player can move and the cell where it is moving is empty or not
         if to_be_updated_player.can_move((nrow, ncol)) and self.is_empty_cell(recent_pos_row, recent_pos_col, nrow, ncol):
+
+
 
             # Update the new position for that player
             to_be_updated_player.cur_row_pos = nrow
@@ -260,7 +271,46 @@ class Board:
                 pass
 
             # After the board is updated with a new move, recalculate the value of SEF for this board instance
+            # This also recalculates the possible play in the updated board.
 
             self.sef_value = self.calculate_sef()
 
-            return
+
+        return True
+
+
+    def is_game_over(self):
+        """ This function checks whether a game is over or not, based on the values computed by sef.
+            i.e., if either player has 0 moves for (1 or 2 or 3 possible hops), then game is over, and
+            other player wins the game
+
+        :return: tuple containing first value that indicates whether game is over or not, True-> game over ; False-> not over
+        and second value, the color of the winner
+        """
+        # possible play for a board, is computed while invoking the calculate_sef method from Board class, which
+        # in turn calls the total_available_move method
+        # Strategy is to, check which players are available in the possible play, and if either of black or white
+        # player does not exists in possible play, game is over and winner is another player
+
+        safe_player=set()
+
+        for each_move in self.possible_play:
+            for k,v in each_move.items():
+                r,c = k
+                for each_player in self.player_list:
+                    if each_player.cur_row_pos == r and each_player.cur_col_pos == c:
+                        safe_player.add(each_player.player_type)
+                        break
+
+                break
+
+        if "black" in safe_player and "white" in safe_player:
+
+            return False, None
+
+        else:
+            winner = "black" if "black" in safe_player else "white"
+
+            return True, winner
+
+
