@@ -15,7 +15,7 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
     record_coordinate_of_move = dict()
 
     if depth == 0 or game_over:
-        return position.calculate_sef(), record_coordinate_of_move
+        return position.calculate_sef(), record_coordinate_of_move, winner
 
 
 
@@ -26,15 +26,24 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
         for child in position.possible_play:
 
             _r = _c = _dr = _dc = None
+            is_updated = False
 
             # Implement the play on the board
             for k, v in child.items():
                 r, c = k
                 dr, dc = v
 
-                _r, _c, _dr, _dc = r, c, dr, dc
-                position.update_board(dr, dc, r, c)
-                break
+                for _player in position.player_list:
+                     ai_player=_player.return_player(r,c)
+                     if ai_player is not None and ai_player.player_type == position.ai_type:
+                        _r, _c, _dr, _dc = r, c, dr, dc
+                        position.update_board(dr, dc, r, c)
+                        is_updated=True
+                        break
+                break                           # dictionary has one one move
+
+            if not is_updated:
+                continue
 
             evaluation, coord = minimax(copy.copy(position), depth-1, alpha, beta, False)
 
@@ -46,7 +55,7 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
             if beta <= alpha:
                 break
 
-        return maxEval, record_coordinate_of_move
+        return maxEval, record_coordinate_of_move, winner
 
     else:
 
@@ -55,15 +64,23 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
         for child in position.possible_play:
 
             _r = _c = _dr = _dc = None
+            is_updated = False
 
             for k, v in child.items():
                 r, c = k
                 dr, dc = v
 
-                _r, _c, _dr, _dc = r, c, dr, dc
-                position.update_board(dr, dc, r, c)
-
+                for _player in position.player_list:
+                     human_player=_player.return_player(r,c)
+                     if human_player is not None and human_player.player_type != position.ai_type:
+                        _r, _c, _dr, _dc = r, c, dr, dc
+                        position.update_board(dr, dc, r, c)
+                        is_updated=True
+                        break
                 break
+
+            if not is_updated:
+                continue
 
             evaluation, coord = minimax(copy.copy(position), depth-1, alpha, beta, True)
 
@@ -76,6 +93,6 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
             if beta <= alpha:
                 break
 
-        return minEval, record_coordinate_of_move
+        return minEval, record_coordinate_of_move, winner
 
 #minimax(currentposition, 3 , -infi, true)
