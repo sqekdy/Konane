@@ -118,9 +118,9 @@ class Board:
                             self.is_empty_cell(fighter.cur_row_pos, fighter.cur_col_pos,
                                                cells_row_in_board, cells_col_in_board)):
 
-                        print(fighter.cur_row_pos, fighter.cur_col_pos)
-                        print("can move")
-                        print(cells_row_in_board, cells_col_in_board)
+                       # print(fighter.cur_row_pos, fighter.cur_col_pos)
+                       # print("can move")
+                       # print(cells_row_in_board, cells_col_in_board)
 
                         self.possible_play.append(
                             {(fighter.cur_row_pos, fighter.cur_col_pos): (cells_row_in_board, cells_col_in_board)})
@@ -256,7 +256,7 @@ class Board:
 
                         pl = self.fetch_player(nrow, captured_player_col)
                         self.player_list.remove(pl)
-                        print("Player removed"+ str(pl.cur_row_pos) + str(pl.cur_col_pos))
+                       # print("Player removed"+ str(pl.cur_row_pos) + str(pl.cur_col_pos))
 
                 else:
                     for captured_player_col in range(recent_pos_col - 1, ncol, -2):
