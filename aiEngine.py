@@ -15,7 +15,7 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
     record_coordinate_of_move = dict()
 
     if depth == 0 or game_over:
-        return position.calculate_sef(), record_coordinate_of_move, winner
+        return position.calculate_sef(), record_coordinate_of_move
 
 
 
@@ -45,7 +45,7 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
             if not is_updated:
                 continue
 
-            evaluation, coord = minimax(copy.copy(position), depth-1, alpha, beta, False)
+            evaluation, coord  = minimax(copy.copy(position), depth-1, alpha, beta, False)
 
             if evaluation > maxEval:
                 record_coordinate_of_move['final'] = [_r, _c, _dr, _dc]
@@ -55,7 +55,7 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
             if beta <= alpha:
                 break
 
-        return maxEval, record_coordinate_of_move, winner
+        return maxEval, record_coordinate_of_move
 
     else:
 
@@ -93,6 +93,6 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
             if beta <= alpha:
                 break
 
-        return minEval, record_coordinate_of_move, winner
+        return minEval, record_coordinate_of_move
 
 #minimax(currentposition, 3 , -infi, true)

@@ -108,12 +108,12 @@ class gameEngine():
                 ai_move_p_row = ai_move_p_col = ai_move_d_row = ai_move_d_col = None
                 search_board = copy.deepcopy(self.current_board)
 
-                best_move_sef, play, king = aiEngine.minimax(search_board, 3, float("-inf"), float("inf"), True)
+                best_move_sef, play = aiEngine.minimax(search_board, 3, float("-inf"), float("inf"), True)
 
-                if king is not None:
-                    print("---------------------------GAME OVER--------------------------------")
-                    print("Winner is -------------- ", king, "----------------------------------")
-                    break
+                # if king is not None:
+                #     print("---------------------------GAME OVER--------------------------------")
+                #     print("Winner is -------------- ", king, "----------------------------------")
+                #     break
 
 
                 for k,v in play.items():
