@@ -3,6 +3,7 @@ from Board import Board
 import game as UI
 import aiEngine
 import copy
+import time
 import threading
 import math
 
@@ -12,7 +13,6 @@ class gameEngine():
     # AI is maximizing player
 
     available_moves = []  # For a particular game, we only maintain one global list that captures possibles moves
-
 
     # in a game state
 
@@ -25,7 +25,7 @@ class gameEngine():
 
         self.game_players = []
 
-        self.current_board=None
+        self.current_board = None
 
         opponent_type = input("Please choose your player type eg. black / white: ")
         self.ai_type = "black" if (opponent_type == "white") else "white"
@@ -52,16 +52,15 @@ class gameEngine():
         # DONE Initialize the board and proceed, continue friday morning
 
         # the following statement draws the board. commenting out as not needed now
-        UI.draw_board(
-            [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in self.game_players])
+
+        self.u_interface = UI.boardUI([(_each_player.cur_col_pos, _each_player.cur_row_pos)
+                                  for _each_player in self.game_players])
+        # UI.draw_board(
+        #     [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in self.game_players])
 
         print([_.player_id for _ in self.game_players])
 
         pass
-
-
-
-
 
     def start_game(self):
         """ This method is where the game starts, initial state of the board is drawn, and two pieces of players are
@@ -96,43 +95,40 @@ class gameEngine():
 
             if (game_turn == 0):
 
-                #TODO iterate through players and fetch the players in possible moves in board, and distinguish
+                # TODO iterate through players and fetch the players in possible moves in board, and distinguish
                 # between black and white possible moves
 
                 # We do not want to change the state of the main game board, while minimax performs forward searching.
                 # A good approach would be to create a duplicate board object of current board and pass that to the function.
                 # This way we can maintain main game board, and experimental search board for the AI.
-                #AI is maximizing player
+                # AI is maximizing player
 
                 is_updated = False
                 ai_move_p_row = ai_move_p_col = ai_move_d_row = ai_move_d_col = None
                 search_board = copy.deepcopy(self.current_board)
 
-                best_move_sef, play = aiEngine.minimax(search_board, 3, float("-inf"), float("inf"), True)
+                best_move_sef, play = aiEngine.minimax(search_board, 4, float("-inf"), float("inf"), True)
 
                 # if king is not None:
                 #     print("---------------------------GAME OVER--------------------------------")
                 #     print("Winner is -------------- ", king, "----------------------------------")
                 #     break
 
+                for k, v in play.items():
+                    ai_move_p_row, ai_move_p_col, ai_move_d_row, ai_move_d_col = v
+                    is_updated = self.current_board.update_board(ai_move_d_row,
+                                                                 ai_move_d_col,
+                                                                 ai_move_p_row,
+                                                                 ai_move_p_col)
 
-                for k,v in play.items():
-
-                        ai_move_p_row, ai_move_p_col, ai_move_d_row, ai_move_d_col = v
-                        is_updated = self.current_board.update_board(ai_move_d_row,
-                                                                     ai_move_d_col,
-                                                                     ai_move_p_row,
-                                                                     ai_move_p_col)
-
-                        break
+                    break
 
                 if is_updated:
-                    print ("AI move is: ", ai_move_p_row,ai_move_p_col, " to ", ai_move_d_row, ai_move_d_col)
+                    print("AI move is: ", ai_move_p_row, ai_move_p_col, " to ", ai_move_d_row, ai_move_d_col)
 
-                    UI.draw_board(
+                    self.u_interface.draw_board(
                         [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in
                          self.current_board.player_list])
-
 
                 game_turn = 1  # Opponent move here
 
@@ -144,29 +140,41 @@ class gameEngine():
                 #       A good implementation might be to power up the board in separate thread so that we have control
                 #       over the console window and the pygame window at the same time.
 
-                while True:
 
-                    try:
-                        player_row, player_col = map(int,tuple(input(
-                            "Please enter row, column of player to move for eg, 25, where 2 is row, and 5 is column: ")))
+                #THe following commented while loop was used to take input from the console
+
+                # while True:
+                #
+                #     try:
+                #         player_row, player_col = map(int, tuple(input(
+                #             "Please enter row, column of player to move for eg, 25, where 2 is row, and 5 is column: ")))
+                #
+                #         player_transfer_row, player_transfer_column = map(int, tuple(input(
+                #             "Please enter a valid move, for eg., 23, where 2 is row and 3 is column: ")))
+                #
+                #     except Exception:
+                #         print("Invalid input. Please try again")
+                #         continue
+                #
+                #     break
 
 
-                        player_transfer_row, player_transfer_column = map(int,tuple(input(
-                        "Please enter a valid move, for eg., 23, where 2 is row and 3 is column: ")))
 
-                    except Exception:
-                        print("Invalid input. Please try again")
-                        continue
 
-                    break
+                player_row, player_col, player_transfer_row, player_transfer_column = self.u_interface.take_input()
 
 
                 self.current_board.update_board(player_transfer_row, player_transfer_column,
-                                           player_row, player_col)
+                                                player_row, player_col)
 
-                UI.draw_board(
-                    [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in self.current_board.player_list])
+                self.u_interface.draw_board([(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in
+                                             self.current_board.player_list])
 
+                time.sleep(3)
+
+                # UI.draw_board(
+                #     [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in
+                #      self.current_board.player_list])
 
                 game_turn = 0  # Next move is AI move
 

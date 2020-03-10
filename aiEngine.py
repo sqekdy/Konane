@@ -25,7 +25,6 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
 
         for child in position.possible_play:
 
-            _r = _c = _dr = _dc = None
             is_updated = False
 
             # Implement the play on the board
