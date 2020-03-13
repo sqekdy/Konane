@@ -27,10 +27,10 @@ class gameEngine():
 
         self.current_board = None
 
-        opponent_type = input("Please choose your player type eg. black / white: ")
-        self.ai_type = "black" if (opponent_type == "white") else "white"
+        self.opponent_type = input("Please choose your player type eg. black / white: ")
+        self.ai_type = "black" if (self.opponent_type == "white") else "white"
         print("\n ------------------------------------------------------------------------------------------------")
-        print("\n GREAT! Your player type is: {} . The AI is : {} ".format(opponent_type, self.ai_type))
+        print("\n GREAT! Your player type is: {} . The AI is : {} ".format(self.opponent_type, self.ai_type))
 
         print("\n ====================BLACK STARTS FIRST============== RENDERING VISUAL...... ================")
 
@@ -107,11 +107,21 @@ class gameEngine():
                 ai_move_p_row = ai_move_p_col = ai_move_d_row = ai_move_d_col = None
                 search_board = copy.deepcopy(self.current_board)
 
-                best_move_sef, play = aiEngine.minimax(search_board, 4, float("-inf"), float("inf"), True)
+                igo, king = self.current_board.is_game_over(self.ai_type)
+                if igo:
+                    print("---------------------------GAME OVER--------------------------------")
+                    print("Winner is -------------- ", king, "----------------------------------")
+                    can_game_continue = False
+                    time.sleep(60)
+
+                    continue
+
+                best_move_sef, play = aiEngine.minimax(search_board, 4, float("-inf"), float("inf"), True, self.ai_type)
+
+
 
                 # if king is not None:
-                #     print("---------------------------GAME OVER--------------------------------")
-                #     print("Winner is -------------- ", king, "----------------------------------")
+                #
                 #     break
 
                 for k, v in play.items():
@@ -159,6 +169,14 @@ class gameEngine():
                 #     break
 
 
+                igo, king= self.current_board.is_game_over(self.opponent_type)
+                if igo:
+                    print("---------------------------GAME OVER--------------------------------")
+                    print("Winner is -------------- ", king, "----------------------------------")
+                    time.sleep(60)
+                    can_game_continue = False
+                    continue
+
 
 
                 player_row, player_col, player_transfer_row, player_transfer_column = self.u_interface.take_input()
@@ -170,7 +188,7 @@ class gameEngine():
                 self.u_interface.draw_board([(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in
                                              self.current_board.player_list])
 
-                time.sleep(3)
+                time.sleep(2)
 
                 # UI.draw_board(
                 #     [(_each_player.cur_col_pos, _each_player.cur_row_pos) for _each_player in

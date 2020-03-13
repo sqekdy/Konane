@@ -7,6 +7,9 @@ class boardUI:
 
         pygame.init()
         self.colors = [(245, 222, 179), (205, 133, 63)]  # Set up colors [wheat, peru]
+        pygame.display.set_caption("Konane- SQEKDY")
+
+        self.clock = pygame.time.Clock()
 
         # TODO This gives error at later stage, as size of board shrinks and board size is pruned
         # Use static value as of now, and figure out to dynamically create the board.
@@ -64,6 +67,7 @@ class boardUI:
         #         break
 
         pygame.display.flip()
+        self.clock.tick(50)
 
 
 
@@ -105,7 +109,9 @@ class boardUI:
                 pygame.draw.rect(self.screen, (255, 0, 0), (col_pos * self.sq_sz, row_pos * self.sq_sz, self.sq_sz,
                                                             self.sq_sz), 5)
 
-                pygame.display.flip()
+                pygame.display.update()
+
+
 
             if selection and count_selection < 2:
                 count_selection += 1
@@ -123,7 +129,8 @@ class boardUI:
                 selected_cell= pygame.draw.rect(self.surface, (50, 205, 50), (col_pos * self.sq_sz, row_pos * self.sq_sz,
                                                                self.sq_sz, self.sq_sz), 5)
 
-                pygame.display.flip()
+                pygame.display.update()
+
 
             if count_selection == 2:
                 return move_coordinate
@@ -153,6 +160,7 @@ class boardUI:
         self.screen.blit(self.surface, (0, 0))
 
         pygame.display.flip()
+
 
 
 

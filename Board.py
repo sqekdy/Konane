@@ -279,7 +279,7 @@ class Board:
         return True
 
 
-    def is_game_over(self):
+    def is_game_over(self, to_play):
         """ This function checks whether a game is over or not, based on the values computed by sef.
             i.e., if either player has 0 moves for (1 or 2 or 3 possible hops), then game is over, and
             other player wins the game
@@ -292,24 +292,26 @@ class Board:
         # Strategy is to, check which players are available in the possible play, and if either of black or white
         # player does not exists in possible play, game is over and winner is another player
 
-        safe_player=set()
+        safe_player = set()
 
         for each_move in self.possible_play:
-            for k,v in each_move.items():
-                r,c = k
+            for k, v in each_move.items():
+                r, c = k
                 for each_player in self.player_list:
-                    if each_player.cur_row_pos == r and each_player.cur_col_pos == c:
+                    if each_player.cur_row_pos == r and each_player.cur_col_pos == c \
+                            and each_player.player_type == to_play:
                         safe_player.add(each_player.player_type)
                         break
 
                 break
 
-        if "black" in safe_player and "white" in safe_player:
+        if len(safe_player) != 0:
 
             return False, None
 
         else:
-            winner = "black" if "black" in safe_player else "white"
+
+            winner = "white" if "black" in to_play else "black"
 
             return True, winner
 

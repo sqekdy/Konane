@@ -1,6 +1,6 @@
 import copy
 
-def minimax(position, depth, alpha, beta, maximizingPlayer):
+def minimax(position, depth, alpha, beta, maximizingPlayer, ai_color):
     """
 
     :param position: current Board object
@@ -10,8 +10,12 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
     :param maximizingPlayer: boolean value that determines whether it's black turn or white turn
     :return: static evaluation value for the best possible move
     """
+    ai = ai_color
+    opponent = "black" if ai == "white" else "white"
 
-    game_over, winner = position.is_game_over()
+    turn_to_play = ai if maximizingPlayer else opponent
+
+    game_over, winner = position.is_game_over(turn_to_play)
     record_coordinate_of_move = dict()
 
     if depth == 0 or game_over:
@@ -44,7 +48,7 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
             if not is_updated:
                 continue
 
-            evaluation, coord  = minimax(copy.copy(position), depth-1, alpha, beta, False)
+            evaluation, coord  = minimax(copy.copy(position), depth-1, alpha, beta, False, ai)
 
             if evaluation > maxEval:
                 record_coordinate_of_move['final'] = [_r, _c, _dr, _dc]
@@ -81,7 +85,7 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
             if not is_updated:
                 continue
 
-            evaluation, coord = minimax(copy.copy(position), depth-1, alpha, beta, True)
+            evaluation, coord = minimax(copy.copy(position), depth-1, alpha, beta, True, ai)
 
             if evaluation < minEval:
                 record_coordinate_of_move['final'] = [_r, _c, _dr, _dc]
